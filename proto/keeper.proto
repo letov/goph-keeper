@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "keeper/proto/compiled";
+
+message Empty {}
+
+message SaveUser {
+  string email = 1;
+  string pass_hash = 2;
+  string public_key = 3;
+}
+
+message LoginUser {
+  string email = 1;
+  string pass_hash = 2;
+}
+
+service GophKeeperService {
+  rpc UpdateValue(SaveUser) returns (Empty);
+  rpc GetValue(LoginUser) returns (Empty);
+}
+
+    protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+    helloworld.proto

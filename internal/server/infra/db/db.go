@@ -1,0 +1,110 @@
+package db
+
+import (
+	"GophKeeper/internal/server/infra/config"
+	"context"
+	"embed"
+	"errors"
+	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
+	"go.uber.org/fx"
+	"go.uber.org/zap"
+)
+
+var ErrNoDBConnection = errors.New("no db connection")
+
+type DB struct {
+	pool *pgxpool.Pool
+	log  zap.SugaredLogger
+}
+
+//go:embed migrations/*.sql
+var embedMigrations embed.FS
+
+func (db *DB) GetPool() *pgxpool.Pool {
+	return db.pool
+}
+
+func (db *DB) QueryJob(query string, args pgx.NamedArgs) func(ctx context.Context) (pgx.Rows, error) {
+	return func(ctx context.Context) (pgx.Rows, error) {
+		return db.pool.Query(ctx, query, args)
+	}
+}
+
+func (db *DB) ExecJob(query string, args pgx.NamedArgs) func(ctx context.Context) (pgconn.CommandTag, error) {
+	return func(ctx context.Context) (pgconn.CommandTag, error) {
+		return db.pool.Exec(ctx, query, args)
+	}
+}
+
+func (db *DB) makeMigrations() {
+	goose.SetBaseFS(embedMigrations)
+
+	if err := goose.SetDialect("postgres"); err != nil {
+		panic(err)
+	}
+
+	sqlDB := stdlib.OpenDBFromPool(db.pool)
+	if err := goose.Up(sqlDB, "migrations"); err != nil {
+		panic(err)
+	}
+	if err := goose.Version(sqlDB, "migrations"); err != nil {
+		db.log.Fatal(err)
+	}
+}
+
+func NewDB(lc fx.Lifecycle, log zap.SugaredLogger, c config.Config) *DB {
+	db := &DB{
+		log: log,
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if len(c.DBAddress) == 0 {
+		log.Info("Empty DB config")
+		return db
+	}
+
+	log.Info("Init DB pool")
+
+	poolConfig, err := pgxpool.ParseConfig(c.DBAddress)
+	if err != nil {
+		log.Warn("Failed to parce config: ", err)
+		return db
+	}
+
+	pool, err := pgxpool.NewWithConfig(ctx, poolConfig)
+	if err != nil {
+		log.Warn("Failed to create db pool: ", err)
+		return db
+	}
+
+	err = pool.Ping(ctx)
+	if err != nil {
+		log.Warn("Failed to ping db: ", err)
+		return db
+	}
+
+	db.pool = pool
+	db.makeMigrations()
+
+	lc.Append(fx.Hook{
+		OnStop: func(ctx context.Context) error {
+			if db.pool == nil {
+				return nil
+			}
+
+			log.Info("Close DB pool")
+			db.pool.Close()
+			return nil
+		},
+	})
+
+	return db
+}
