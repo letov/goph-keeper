@@ -28,7 +28,7 @@ func (ur *UserRepoDB) Save(ctx context.Context, u dto.SaveUser) error {
 }
 
 func (ur *UserRepoDB) Login(ctx context.Context, l dto.LoginUser) (bool, error) {
-	query := `SELECT id FROM users WHERE email=@email AND pass_hash=@pass_hash`
+	query := `SELECT count(id) as count FROM users WHERE email=@email AND pass_hash=@pass_hash`
 	args := pgx.NamedArgs{
 		"email":     l.Email,
 		"pass_hash": l.PassHash,
@@ -42,7 +42,9 @@ func (ur *UserRepoDB) Login(ctx context.Context, l dto.LoginUser) (bool, error) 
 	defer rows.Close()
 
 	for rows.Next() {
-		return true, nil
+		var count int
+		err = rows.Scan(&count)
+		return count == 1, err
 	}
 	return false, nil
 }

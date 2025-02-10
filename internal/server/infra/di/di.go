@@ -4,6 +4,7 @@ import (
 	"GophKeeper/internal/server/app/repo"
 	"GophKeeper/internal/server/infra/config"
 	"GophKeeper/internal/server/infra/db"
+	"GophKeeper/internal/server/infra/grpcserver"
 	"GophKeeper/internal/server/infra/logger"
 	"GophKeeper/internal/server/infra/store"
 
@@ -21,5 +22,7 @@ func InjectApp() fx.Option {
 		func(ur *store.UserRepoDB) repo.User {
 			return ur
 		},
+
+		grpcserver.NewGrpcServer,
 	)
 }

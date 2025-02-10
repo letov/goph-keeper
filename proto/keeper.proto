@@ -5,19 +5,22 @@ package proto;
 option go_package = "compiled/pb";
 
 message Empty {}
+message LoginResponse {
+  bool status = 1;
+}
 
-message SaveUser {
+message SaveUserDto {
   string email = 1;
   string pass_hash = 2;
   string public_key = 3;
 }
 
-message LoginUser {
+message LoginUserDto {
   string email = 1;
   string pass_hash = 2;
 }
 
 service GophKeeperService {
-  rpc UpdateValue(SaveUser) returns (Empty);
-  rpc GetValue(LoginUser) returns (Empty);
+  rpc SaveUser(SaveUserDto) returns (Empty);
+  rpc LoginUser(LoginUserDto) returns (LoginResponse);
 }

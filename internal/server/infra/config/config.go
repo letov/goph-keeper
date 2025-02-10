@@ -8,7 +8,8 @@ import (
 )
 
 type Config struct {
-	DBAddress string
+	DBAddress   string
+	GrpcAddress string
 }
 
 func NewConfig() Config {
@@ -19,7 +20,8 @@ func NewConfig() Config {
 	}
 
 	return Config{
-		DBAddress: getEnv("DATABASE_DSN", ""),
+		DBAddress:   getEnv("DATABASE_DSN", ""),
+		GrpcAddress: getEnv("GRPC_ADDRESS", ""),
 	}
 }
 

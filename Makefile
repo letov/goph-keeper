@@ -8,4 +8,4 @@ down:
 	$(docker_compose_bin) down -v
 
 protoc:
-	protoc ./proto/keeper.proto --go_out=./proto
+	protoc ./proto/keeper.proto --go_out=./proto --go-grpc_out=./proto
