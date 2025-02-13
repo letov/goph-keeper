@@ -10,6 +10,7 @@ import (
 type Config struct {
 	DBAddress   string
 	GrpcAddress string
+	JWTSecret   string
 }
 
 func NewConfig() Config {
@@ -22,6 +23,7 @@ func NewConfig() Config {
 	return Config{
 		DBAddress:   getEnv("DATABASE_DSN", ""),
 		GrpcAddress: getEnv("GRPC_ADDRESS", ""),
+		JWTSecret:   getEnv("JWT_SECRET", ""),
 	}
 }
 

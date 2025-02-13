@@ -1,8 +1,8 @@
 package grpcserver
 
 import (
-	"GophKeeper/internal/server/app/dto"
 	"GophKeeper/internal/server/app/repo"
+	"GophKeeper/internal/server/infra/auth"
 	"GophKeeper/internal/server/infra/config"
 	"GophKeeper/proto/compiled/pb"
 	"context"
@@ -14,20 +14,10 @@ import (
 )
 
 type Grpc struct {
-	ur repo.User
+	ur   repo.User
+	sr   repo.Snapshot
+	auth *auth.Service
 	pb.UnimplementedGophKeeperServiceServer
-}
-
-func (m *Grpc) SaveUser(ctx context.Context, data *pb.SaveUserDto) (*pb.Empty, error) {
-	d := dto.NewSaveUser(data)
-	err := m.ur.Save(ctx, d)
-	return &pb.Empty{}, err
-}
-
-func (m *Grpc) LoginUser(ctx context.Context, data *pb.LoginUserDto) (*pb.LoginResponse, error) {
-	d := dto.NewLoginUser(data)
-	status, err := m.ur.Login(ctx, d)
-	return &pb.LoginResponse{Status: status}, err
 }
 
 func NewGrpcServer(
@@ -35,9 +25,12 @@ func NewGrpcServer(
 	log zap.SugaredLogger,
 	c config.Config,
 	ur repo.User,
+	sr repo.Snapshot,
+	ai *AuthInterceptor,
+	auth *auth.Service,
 ) *grpc.Server {
-	srv := grpc.NewServer()
-	grpcServer := &Grpc{ur: ur}
+	srv := grpc.NewServer(grpc.UnaryInterceptor(ai.UnaryAuthMiddleware))
+	grpcServer := &Grpc{ur: ur, sr: sr, auth: auth}
 	pb.RegisterGophKeeperServiceServer(srv, grpcServer)
 
 	lc.Append(fx.Hook{

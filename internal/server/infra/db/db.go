@@ -4,19 +4,14 @@ import (
 	"GophKeeper/internal/server/infra/config"
 	"context"
 	"embed"
-	"errors"
 	"time"
 
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
-
-var ErrNoDBConnection = errors.New("no db connection")
 
 type DB struct {
 	pool *pgxpool.Pool
@@ -28,18 +23,6 @@ var embedMigrations embed.FS
 
 func (db *DB) GetPool() *pgxpool.Pool {
 	return db.pool
-}
-
-func (db *DB) QueryJob(query string, args pgx.NamedArgs) func(ctx context.Context) (pgx.Rows, error) {
-	return func(ctx context.Context) (pgx.Rows, error) {
-		return db.pool.Query(ctx, query, args)
-	}
-}
-
-func (db *DB) ExecJob(query string, args pgx.NamedArgs) func(ctx context.Context) (pgconn.CommandTag, error) {
-	return func(ctx context.Context) (pgconn.CommandTag, error) {
-		return db.pool.Exec(ctx, query, args)
-	}
 }
 
 func (db *DB) makeMigrations() {

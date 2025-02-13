@@ -1,12 +1,17 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 package proto;
 
 option go_package = "compiled/pb";
 
-message Empty {}
-message LoginResponse {
-  bool status = 1;
+message UserResponse {
+  string jwt = 1;
+}
+
+message Response {
+  int32 status = 1;
 }
 
 message SaveUserDto {
@@ -20,7 +25,33 @@ message LoginUserDto {
   string pass_hash = 2;
 }
 
+message LoginPasswordDto {
+  bytes login = 1;
+  bytes password = 2;
+  bytes meta = 3;
+}
+
+message BinaryDto {
+  bytes binary = 1;
+  bytes meta = 2;
+}
+
+message BankCardDto {
+  bytes number = 1;
+  bytes date = 2;
+  bytes cvv = 3;
+  bytes meta = 4;
+}
+
+message SnapshotDto {
+  repeated LoginPasswordDto login_password_list = 1;
+  repeated BinaryDto binary_list = 3;
+  repeated BankCardDto bank_card_list = 4;
+}
+
 service GophKeeperService {
-  rpc SaveUser(SaveUserDto) returns (Empty);
-  rpc LoginUser(LoginUserDto) returns (LoginResponse);
+  rpc SaveUser(SaveUserDto) returns (Response);
+  rpc LoginUser(LoginUserDto) returns (UserResponse);
+  rpc SaveSnapshot(SnapshotDto) returns (Response);
+  rpc GetSnapshot(google.protobuf.Empty) returns (SnapshotDto);
 }

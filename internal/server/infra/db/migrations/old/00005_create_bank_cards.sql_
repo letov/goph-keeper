@@ -1,0 +1,15 @@
+-- +goose Up
+CREATE TABLE bank_cards (
+		id SERIAL PRIMARY KEY,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		owner INTEGER NOT NULL,
+		meta_key INTEGER DEFAULT NULL,
+		number_key INTEGER DEFAULT NULL,
+		date_key INTEGER DEFAULT NULL,
+		cvv_key INTEGER DEFAULT NULL,
+		CONSTRAINT "FK_bank_cards__owner___users__id" FOREIGN KEY ("owner") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+-- +goose Down
+DROP TABLE bank_cards;

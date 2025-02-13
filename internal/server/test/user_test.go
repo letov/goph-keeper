@@ -10,11 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_SaveUser(t *testing.T) {
+func Test_User(t *testing.T) {
 	type args struct {
-		Email     string
-		PassHash  string
-		PublicKey string
+		SaveUserDto dto.SaveUser
 	}
 
 	tests := []struct {
@@ -24,9 +22,11 @@ func Test_SaveUser(t *testing.T) {
 		{
 			name: "save/login user test",
 			args: args{
-				Email:     "email",
-				PassHash:  "password_hash",
-				PublicKey: "public_key",
+				SaveUserDto: dto.SaveUser{
+					Email:     "Email",
+					PassHash:  "PassHash",
+					PublicKey: "PublicKey",
+				},
 			},
 		},
 	}
@@ -37,12 +37,18 @@ func Test_SaveUser(t *testing.T) {
 				ctx := context.Background()
 				_ = flushDB(ctx, db)
 
-				_ = ur.Save(ctx, dto.SaveUser(tt.args))
-				res, _ := ur.Login(ctx, dto.LoginUser{
-					Email:    tt.args.Email,
-					PassHash: tt.args.PassHash,
+				_ = ur.SaveUser(ctx, tt.args.SaveUserDto)
+				id, _ := ur.LoginUser(ctx, dto.LoginUser{
+					Email:    tt.args.SaveUserDto.Email,
+					PassHash: tt.args.SaveUserDto.PassHash,
 				})
-				assert.True(t, res)
+				assert.Greater(t, id, int32(0))
+
+				res, _ := ur.LoginUser(ctx, dto.LoginUser{
+					Email:    tt.args.SaveUserDto.Email,
+					PassHash: tt.args.SaveUserDto.PassHash,
+				})
+				assert.Greater(t, res, int32(0))
 			})
 		})
 	}
