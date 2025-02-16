@@ -1,4 +1,4 @@
-# Goka messenger
+# Goph Password Keeper
 
 ![example!](./docs/example.gif "example")
 
