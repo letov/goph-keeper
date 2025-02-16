@@ -3,8 +3,8 @@
 ![example!](./docs/example.gif "example")
 
 ## Архитектура проекта
-![C12!](./docs/c12.png "C12")
-![C3!](./docs/c3.png "C3")
+![c12!](./docs/c12.png "c12")
+![c3!](./docs/c3.png "c3")
 
 ## Структура проекта
 
