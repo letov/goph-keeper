@@ -2,13 +2,11 @@ package store
 
 import (
 	"GophKeeper/internal/common/dto"
-	"context"
-
-	"github.com/jackc/pgx/v5"
+	"database/sql"
 )
 
-func (r *RepoDB) getBinaryList(ctx context.Context, owner int32) ([]dto.Binary, error) {
-	rows, err := r.getPrivateList(ctx, Binary, owner)
+func (r *RepoDB) getLoginPasswordList() ([]dto.LoginPassword, error) {
+	rows, err := r.getPrivateList(LoginPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +17,7 @@ func (r *RepoDB) getBinaryList(ctx context.Context, owner int32) ([]dto.Binary, 
 		tp    KeyValueType
 		value []byte
 	)
-	m := make(map[int32]dto.Binary)
+	m := make(map[int32]dto.LoginPassword)
 	for rows.Next() {
 		err = rows.Scan(&id, &tp, &value)
 		if err != nil {
@@ -27,13 +25,15 @@ func (r *RepoDB) getBinaryList(ctx context.Context, owner int32) ([]dto.Binary, 
 		}
 		d, ok := m[id]
 		if !ok {
-			m[id] = dto.Binary{}
+			m[id] = dto.LoginPassword{}
 		}
 		switch tp {
 		case Meta:
 			d.Meta = value
-		case BinaryValue:
-			d.Binary = value
+		case Login:
+			d.Login = value
+		case Password:
+			d.Password = value
 		}
 		m[id] = d
 	}
@@ -41,16 +41,17 @@ func (r *RepoDB) getBinaryList(ctx context.Context, owner int32) ([]dto.Binary, 
 	return mapToArr(m), nil
 }
 
-func updateBinaryList(ctx context.Context, tx pgx.Tx, l []dto.Binary, owner int32) error {
+func updateLoginPasswordList(tx *sql.Tx, l []dto.LoginPassword) error {
 	kvms := make([]KeyValueMap, 0)
 	for _, e := range l {
 		kvms = append(kvms, KeyValueMap{
-			Meta:        e.Meta,
-			BinaryValue: e.Binary,
+			Meta:     e.Meta,
+			Login:    e.Login,
+			Password: e.Password,
 		})
 	}
 
-	if err := savePrivateList(ctx, tx, Binary, kvms, owner); err != nil {
+	if err := savePrivateList(tx, LoginPassword, kvms); err != nil {
 		return err
 	}
 

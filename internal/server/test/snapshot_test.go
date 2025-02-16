@@ -1,7 +1,7 @@
 package test
 
 import (
-	"GophKeeper/internal/server/app/dto"
+	dto2 "GophKeeper/internal/common/dto"
 	"GophKeeper/internal/server/app/repo"
 	"GophKeeper/internal/server/infra/db"
 	"context"
@@ -12,8 +12,8 @@ import (
 
 func Test_Snapshot(t *testing.T) {
 	type args struct {
-		SaveUserDto dto.SaveUser
-		Snapshot    dto.Snapshot
+		SaveUserDto dto2.SaveUser
+		Snapshot    dto2.Snapshot
 	}
 
 	tests := []struct {
@@ -23,34 +23,54 @@ func Test_Snapshot(t *testing.T) {
 		{
 			name: "save/get snapshot test",
 			args: args{
-				SaveUserDto: dto.SaveUser{
-					Email:     "Email",
-					PassHash:  "PassHash",
-					PublicKey: "PublicKey",
+				SaveUserDto: dto2.SaveUser{
+					Email:    "some@email.com",
+					PassHash: "pass_hash",
 				},
-				Snapshot: dto.Snapshot{
-					LoginPasswordList: []dto.LoginPassword{
+				Snapshot: dto2.Snapshot{
+					LoginPasswordList: []dto2.LoginPassword{
 						{
-							Meta:     []byte("Meta"),
-							Login:    []byte("Login"),
-							Password: []byte("Password"),
+							Meta:     []byte("vk"),
+							Login:    []byte("some@mail.com"),
+							Password: []byte("secret_password"),
+						},
+						{
+							Meta:     []byte("yandex"),
+							Login:    []byte("some@mail.com"),
+							Password: []byte("secret_password"),
+						},
+						{
+							Meta:     []byte("google"),
+							Login:    []byte("some@mail.com"),
+							Password: []byte("secret_password"),
 						},
 					},
-					BinaryList: []dto.Binary{
+					BinaryList: []dto2.Binary{
 						{
-							Binary: []byte("Text"),
+							Meta:   []byte("file1"),
+							Binary: []byte("data1"),
 						},
 						{
-							Binary: []byte("Text"),
+							Meta:   []byte("file2"),
+							Binary: []byte("data2"),
 						},
 						{
-							Binary: []byte("Text"),
+							Meta:   []byte("file3"),
+							Binary: []byte("data3"),
 						},
 					},
-					BankCardList: []dto.BankCard{
+					BankCardList: []dto2.BankCard{
 						{
-							Meta:   []byte("Meta"),
-							Number: []byte("Login"),
+							Meta:   []byte("sber"),
+							Number: []byte("4444 3333 2222 1111"),
+							Date:   []byte("10.10.2030"),
+							Cvv:    []byte("111"),
+						},
+						{
+							Meta:   []byte("tbank"),
+							Number: []byte("4444 3333 2222 1111"),
+							Date:   []byte("10.10.2030"),
+							Cvv:    []byte("111"),
 						},
 					},
 				},
@@ -65,7 +85,7 @@ func Test_Snapshot(t *testing.T) {
 				_ = flushDB(ctx, db)
 
 				_ = ur.SaveUser(ctx, tt.args.SaveUserDto)
-				owner, _ := ur.LoginUser(ctx, dto.LoginUser{
+				owner, _ := ur.LoginUser(ctx, dto2.LoginUser{
 					Email:    tt.args.SaveUserDto.Email,
 					PassHash: tt.args.SaveUserDto.PassHash,
 				})

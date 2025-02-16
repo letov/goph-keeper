@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"GophKeeper/internal/server/app/dto"
+	"GophKeeper/internal/common/dto"
 	"context"
 )
 

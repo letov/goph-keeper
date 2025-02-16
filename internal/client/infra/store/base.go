@@ -1,20 +1,20 @@
 package store
 
 import (
-	"GophKeeper/internal/server/infra/db"
+	"GophKeeper/internal/client/infra/db"
+	"database/sql"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 )
 
 type RepoDB struct {
-	pool *pgxpool.Pool
-	log  zap.SugaredLogger
+	db  *sql.DB
+	log zap.SugaredLogger
 }
 
 func NewRepoDB(db *db.DB, log zap.SugaredLogger) *RepoDB {
 	return &RepoDB{
-		db.GetPool(),
-		log,
+		db:  db.GetDB(),
+		log: log,
 	}
 }

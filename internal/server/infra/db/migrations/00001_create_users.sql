@@ -5,7 +5,6 @@ CREATE TABLE users (
 		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		email VARCHAR NOT NULL,
 		pass_hash VARCHAR NOT NULL,
-		public_key VARCHAR NOT NULL,
 		CONSTRAINT "uniq_users__email" UNIQUE (email)
 );
 

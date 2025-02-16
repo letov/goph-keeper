@@ -1,7 +1,7 @@
 package grpcserver
 
 import (
-	"GophKeeper/internal/server/app/dto"
+	"GophKeeper/internal/common/dto"
 	"GophKeeper/proto/compiled/pb"
 	"context"
 	"strconv"

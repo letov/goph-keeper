@@ -1,7 +1,7 @@
 package store
 
 import (
-	"GophKeeper/internal/server/app/dto"
+	"GophKeeper/internal/common/dto"
 	"context"
 	"strings"
 
@@ -9,11 +9,10 @@ import (
 )
 
 func (r *RepoDB) SaveUser(ctx context.Context, u dto.SaveUser) error {
-	query := `INSERT INTO users (email, pass_hash, public_key) VALUES (@email, @pass_hash, @public_key)`
+	query := `INSERT INTO users (email, pass_hash) VALUES (@email, @pass_hash)`
 	args := pgx.NamedArgs{
-		"email":      u.Email,
-		"pass_hash":  u.PassHash,
-		"public_key": u.PublicKey,
+		"email":     u.Email,
+		"pass_hash": u.PassHash,
 	}
 
 	_, err := r.pool.Exec(ctx, query, args)

@@ -1,7 +1,7 @@
 package test
 
 import (
-	"GophKeeper/internal/server/app/dto"
+	"GophKeeper/internal/common/dto"
 	"GophKeeper/internal/server/app/repo"
 	"GophKeeper/internal/server/infra/db"
 	"context"
@@ -23,9 +23,8 @@ func Test_User(t *testing.T) {
 			name: "save/login user test",
 			args: args{
 				SaveUserDto: dto.SaveUser{
-					Email:     "Email",
-					PassHash:  "PassHash",
-					PublicKey: "PublicKey",
+					Email:    "some@email.com",
+					PassHash: "pass_hash",
 				},
 			},
 		},

@@ -1,7 +1,7 @@
 package store
 
 import (
-	"GophKeeper/internal/server/app/dto"
+	"GophKeeper/internal/common/dto"
 	"context"
 
 	"github.com/jackc/pgx/v5"

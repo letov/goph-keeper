@@ -23,7 +23,7 @@ func (s *Service) IssueToken(userID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": userID,
 		"iss": time.Now().Unix(),
-		"exp": time.Now().Add(time.Minute * 15).Unix(),
+		"exp": time.Now().Add(time.Minute * 20).Unix(),
 	}, nil)
 
 	signed, err := token.SignedString(s.secret)

@@ -2,13 +2,11 @@ package store
 
 import (
 	"GophKeeper/internal/common/dto"
-	"context"
-
-	"github.com/jackc/pgx/v5"
+	"database/sql"
 )
 
-func (r *RepoDB) getBinaryList(ctx context.Context, owner int32) ([]dto.Binary, error) {
-	rows, err := r.getPrivateList(ctx, Binary, owner)
+func (r *RepoDB) getBinaryList() ([]dto.Binary, error) {
+	rows, err := r.getPrivateList(Binary)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +39,7 @@ func (r *RepoDB) getBinaryList(ctx context.Context, owner int32) ([]dto.Binary, 
 	return mapToArr(m), nil
 }
 
-func updateBinaryList(ctx context.Context, tx pgx.Tx, l []dto.Binary, owner int32) error {
+func updateBinaryList(tx *sql.Tx, l []dto.Binary) error {
 	kvms := make([]KeyValueMap, 0)
 	for _, e := range l {
 		kvms = append(kvms, KeyValueMap{
@@ -50,7 +48,7 @@ func updateBinaryList(ctx context.Context, tx pgx.Tx, l []dto.Binary, owner int3
 		})
 	}
 
-	if err := savePrivateList(ctx, tx, Binary, kvms, owner); err != nil {
+	if err := savePrivateList(tx, Binary, kvms); err != nil {
 		return err
 	}
 

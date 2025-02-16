@@ -1,3 +1,5 @@
 /.idea
+/.env.client
 /.env.server
 /proto/compiled/*
+/private.sqlite
