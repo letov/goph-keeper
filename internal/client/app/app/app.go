@@ -5,6 +5,5 @@ import (
 	"GophKeeper/internal/client/infra/db"
 )
 
-func Start(db *db.DB, _ *view.Root) {
-	print(db)
+func Start(_ *db.DB, _ *view.Root) {
 }
